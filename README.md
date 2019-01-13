@@ -1,4 +1,4 @@
-# A client mod for Wurm Unlimited
+# Pretty spell list - client mod for Wurm Unlimited
 
 Replaces the default spell list in popup menu. 
 
