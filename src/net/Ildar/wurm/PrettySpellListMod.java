@@ -70,16 +70,18 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
                 return method.invoke(proxy, args);
             }));
             HookManager.getInstance().registerHook("com.wurmonline.client.renderer.gui.HeadsUpDisplay", "popupReceived", "(BLjava/util/List;Ljava/lang/String;)V", () -> ((proxy, method, args) -> {
+                List<PlayerAction> actions = (List<PlayerAction>) args[1];
+                List<SpellAction> spellActions = new ArrayList<>();
+                for (PlayerAction playerAction : new ArrayList<>(actions)) {
+                    SpellAction spellAction = SpellAction.getByActionId(playerAction.getId());
+                    if (spellAction != SpellAction.UnknownSpell) {
+                        spellActions.add(spellAction);
+                        actions.remove(playerAction);
+                    }
+                }
                 Object result = method.invoke(proxy, args);
                 if (!showPrettySpellListOption.value())
                     return result;
-                List<PlayerAction> actions = (List<PlayerAction>) args[1];
-                List<SpellAction> spellActions = new ArrayList<>();
-                for (PlayerAction playerAction : actions) {
-                    SpellAction spellAction = SpellAction.getByActionId(playerAction.getId());
-                    if (spellAction != SpellAction.UnknownSpell)
-                        spellActions.add(spellAction);
-                }
                 if (!spellActions.isEmpty()) {
                     Object wurmPopup = ReflectionUtil.getPrivateField(hud, ReflectionUtil.getField(HeadsUpDisplay.class, "lastPopup"));
                     int x = ReflectionUtil.getPrivateField(wurmPopup, ReflectionUtil.getField(wurmPopup.getClass(), "x"));
