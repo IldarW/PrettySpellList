@@ -76,8 +76,11 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
                     SpellAction spellAction = SpellAction.getByActionId(playerAction.getId());
                     if (spellAction != SpellAction.UnknownSpell) {
                         spellActions.add(spellAction);
-                        actions.remove(playerAction);
+                        if (showPrettySpellListOption.value())
+                            actions.remove(playerAction);
                     }
+                    if (showPrettySpellListOption.value() && playerAction.getName().equals("Spells") && playerAction.getId() < 0)
+                        actions.remove(playerAction);
                 }
                 Object result = method.invoke(proxy, args);
                 if (!showPrettySpellListOption.value())
