@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 public class PrettySpellListView extends ContainerComponent {
     private static final int ICON_SIZE = 32;
     private static final int BOTTOM_PADDING = 16;
-    private static final int SIDE_STICHES_WIDTH = 13;
+    private static final int SIDE_STITCHES_WIDTH = 13;
     private static final Map<SpellAction, BufferedImage> cachedSpellIcons = new HashMap<>();
-    private static Texture verticalTilingTexture;
+    private static Texture verticalStitchesTexture;
 
     private List<SpellButton> spellButtons;
     private int rowSize;
@@ -56,23 +56,23 @@ public class PrettySpellListView extends ContainerComponent {
                 }
             }));
         }
-        setInitialSize(rowSize * ICON_SIZE + SIDE_STICHES_WIDTH, rowCount * ICON_SIZE + 2 * SIDE_STICHES_WIDTH + BOTTOM_PADDING, false);
+        setInitialSize(rowSize * ICON_SIZE + SIDE_STITCHES_WIDTH, rowCount * ICON_SIZE + 2 * SIDE_STITCHES_WIDTH + BOTTOM_PADDING, false);
         setPosition(x - width, y);
         layout();
         this.sizeFlags = FlexComponent.FIXED_WIDTH | FlexComponent.FIXED_HEIGHT;
-        prepareVerticalTilingTexture();
+        prepareVerticalStitchesTexture();
     }
 
-    private void prepareVerticalTilingTexture() {
-//        if (verticalTilingTexture != null)
-//            return;
+    private void prepareVerticalStitchesTexture() {
+        if (verticalStitchesTexture != null)
+            return;
         try {
             BufferedImage image = ImageIO.read(WurmComponent.panelTextureTilingH.getUrl().openStream());
             AffineTransform transform = new AffineTransform();
             transform.rotate(-Math.PI / 2, image.getWidth() / 2, image.getHeight() / 2);
             AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             image = op.filter(image, null);
-            verticalTilingTexture = ImageTextureLoader.loadNowrapMipmapTexture(image, false);
+            verticalStitchesTexture = ImageTextureLoader.loadNowrapMipmapTexture(image, false);
         } catch (IOException e) {
             Logger.getLogger(PrettySpellListMod.class.getSimpleName()).log(Level.WARNING, e.getMessage(), e);
         }
@@ -137,7 +137,7 @@ public class PrettySpellListView extends ContainerComponent {
             final int hh = height * (row + 1) / rowCount - yy;
             SpellButton spellButton = spellButtons.get(i);
             if (spellButton != null)
-                spellButton.setLocation(this.x + xx + SIDE_STICHES_WIDTH, this.y + yy + SIDE_STICHES_WIDTH, ww, hh);
+                spellButton.setLocation(this.x + xx + SIDE_STITCHES_WIDTH, this.y + yy + SIDE_STITCHES_WIDTH, ww, hh);
         }
     }
 
@@ -149,23 +149,23 @@ public class PrettySpellListView extends ContainerComponent {
     protected void renderComponent(Queue queue, float alpha) {
         this.drawTexTilingH(queue, WurmComponent.panelTextureTilingH, this.r, this.g, this.b, 1.0f,
                 this.x + 3, this.y,
-                this.width - 3, SIDE_STICHES_WIDTH,
-                128, SIDE_STICHES_WIDTH);
+                this.width - 3, SIDE_STITCHES_WIDTH,
+                128, SIDE_STITCHES_WIDTH);
         this.drawTexTilingH(queue, WurmComponent.panelTextureTilingH, this.r, this.g, this.b, 1.0f,
-                this.x + 3, this.y + this.height - BOTTOM_PADDING - SIDE_STICHES_WIDTH,
+                this.x + 3, this.y + this.height - BOTTOM_PADDING - SIDE_STITCHES_WIDTH,
                 this.width - 3, BOTTOM_PADDING,
                 141, BOTTOM_PADDING);
-        this.drawTexture(queue, verticalTilingTexture, this.r, this.g, this.b, 1.0f,
+        this.drawTexture(queue, verticalStitchesTexture, this.r, this.g, this.b, 1.0f,
                 this.x, this.y + 4,
-                SIDE_STICHES_WIDTH, this.height - BOTTOM_PADDING - 9,
+                SIDE_STITCHES_WIDTH, this.height - BOTTOM_PADDING - 9,
                 128, 4,
-                SIDE_STICHES_WIDTH, this.height - BOTTOM_PADDING - 9);
+                SIDE_STITCHES_WIDTH, this.height - BOTTOM_PADDING - 9);
         final int wBg = this.width;
-        final int hBg = this.height - 2 * SIDE_STICHES_WIDTH - BOTTOM_PADDING;
+        final int hBg = this.height - 2 * SIDE_STITCHES_WIDTH - BOTTOM_PADDING;
         final float u = wBg / 64.0f;
         final float v = hBg / 64.0f;
         this.drawTexture(queue, WurmPopup.backgroundTexture2, this.r, this.g, this.b, 1.0f,
-                this.x + SIDE_STICHES_WIDTH, this.y + SIDE_STICHES_WIDTH,
+                this.x + SIDE_STITCHES_WIDTH, this.y + SIDE_STITCHES_WIDTH,
                 wBg, hBg, 0, 0,
                 (int) (u * 256.0f), (int) (v * 256.0f));
         for (SpellButton spellButton : spellButtons) {
