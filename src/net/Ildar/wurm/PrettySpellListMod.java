@@ -152,9 +152,6 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
 
     public static boolean handleInput(final String cmd, final String[] data) {
         switch (cmd) {
-            case "printoptions":
-                hud.consoleOutput("Show pretty spell list - " + showPrettySpellListOption.value() + ", List row size - " + listRowSizeOption.value());
-                return true;
             default:
                 return false;
         }
