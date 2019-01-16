@@ -44,7 +44,7 @@ public enum SpellAction {
     HateLibila(262, "Libila demise"),
     HateMagranon(260, "Magranon demise"),
     HateFo(259, "Fo demise"),
-    HateRegeneration(268, "Troll demise"),
+    HateRegeneration(268, "Selfhealer demise"),
     HateVynora(261, "Vynora demise"),
     Heal(249),
     Hellstrength(427, "Hell strength"),

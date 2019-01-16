@@ -36,6 +36,7 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
     private static Logger logger = Logger.getLogger(PrettySpellListMod.class.getSimpleName());
     private static BooleanOption showPrettySpellListOption;
     private static RangeOption listRowSizeOption;
+    private static BooleanOption hideDefaultSpellActions;
     private static HeadsUpDisplay hud;
     private static Properties properties;
 
@@ -72,15 +73,17 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
             HookManager.getInstance().registerHook("com.wurmonline.client.renderer.gui.HeadsUpDisplay", "popupReceived", "(BLjava/util/List;Ljava/lang/String;)V", () -> ((proxy, method, args) -> {
                 List<PlayerAction> actions = (List<PlayerAction>) args[1];
                 List<SpellAction> spellActions = new ArrayList<>();
-                for (PlayerAction playerAction : new ArrayList<>(actions)) {
-                    SpellAction spellAction = SpellAction.getByActionId(playerAction.getId());
-                    if (spellAction != SpellAction.UnknownSpell) {
-                        spellActions.add(spellAction);
-                        if (showPrettySpellListOption.value())
+                if (showPrettySpellListOption.value()) {
+                    for (PlayerAction playerAction : new ArrayList<>(actions)) {
+                        SpellAction spellAction = SpellAction.getByActionId(playerAction.getId());
+                        if (spellAction != SpellAction.UnknownSpell) {
+                            spellActions.add(spellAction);
+                            if (hideDefaultSpellActions.value())
+                                actions.remove(playerAction);
+                        }
+                        if (hideDefaultSpellActions.value() && playerAction.getName().equals("Spells") && playerAction.getId() < 0)
                             actions.remove(playerAction);
                     }
-                    if (showPrettySpellListOption.value() && playerAction.getName().equals("Spells") && playerAction.getId() < 0)
-                        actions.remove(playerAction);
                 }
                 Object result = method.invoke(proxy, args);
                 if (!showPrettySpellListOption.value())
@@ -119,7 +122,7 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
             e.printStackTrace();
             return;
         }
-        for(Object wurmComponent : new ArrayList<>(hudComponents)) {
+        for (Object wurmComponent : new ArrayList<>(hudComponents)) {
             if (wurmComponent instanceof PrettySpellListView)
                 hudComponents.remove(wurmComponent);
         }
@@ -137,12 +140,15 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
             showPrettySpellListOption.set(properties.getProperty(Option.ShowPrettySpellList.name(), "true").equals("true"));
             listRowSizeOption = (RangeOption) rangeOptionConstructor.newInstance(Option.ListRowSize.name(), dynamicOptionsField.get(null), 5, 1, 20);
             listRowSizeOption.set(Integer.parseInt(properties.getProperty(Option.ListRowSize.name(), "5")));
+            hideDefaultSpellActions = (BooleanOption) booleanOptionConstructor.newInstance(Option.HideOldSpellActions.name(), dynamicOptionsField.get(null), true);
+            hideDefaultSpellActions.set(properties.getProperty(Option.HideOldSpellActions.name(), "true").equals("true"));
             Field settingsInstanceField = ReflectionUtil.getField(WurmSettingsFX.class, "instance");
             settingsInstanceField.setAccessible(true);
             WurmSettingsFX wurmSettingsFX = (WurmSettingsFX) settingsInstanceField.get(null);
             wurmSettingsFX.addSpacer(Option.section);
             wurmSettingsFX.addOption(Option.section, new BooleanOptionControl(showPrettySpellListOption, Option.ShowPrettySpellList.description, Option.ShowPrettySpellList.tooltip, true));
             wurmSettingsFX.addOption(Option.section, new RangeSpinOptionControl(listRowSizeOption, Option.ListRowSize.description, Option.ListRowSize.tooltip, true));
+            wurmSettingsFX.addOption(Option.section, new BooleanOptionControl(hideDefaultSpellActions, Option.HideOldSpellActions.description, Option.HideOldSpellActions.tooltip, true));
         } catch (Exception e) {
             hud.consoleOutput("Error on option initialization");
             e.printStackTrace();
