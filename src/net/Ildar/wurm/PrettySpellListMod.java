@@ -96,7 +96,7 @@ public class PrettySpellListMod implements WurmClientMod, Initable, PreInitable,
                     int columns = Math.min(PrettySpellListMod.listRowSizeOption.value(), spellActions.size());
                     PrettySpellListView spellListView = new PrettySpellListView(spellActions, x, y, columns, spellAction -> {
                         if (spellAction != SpellAction.UnknownSpell)
-                            hud.sendAction(new PlayerAction(spellAction.getActionId(), PlayerAction.ANYTHING), popupTargets);
+                            hud.sendAction(new PlayerAction("", spellAction.getActionId(), PlayerAction.ANYTHING), popupTargets);
                         clearPrettySpellLists();
                     });
                     Method showComponentMethod = ReflectionUtil.getMethod(HeadsUpDisplay.class, "showComponent");
